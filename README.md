@@ -26,7 +26,7 @@ You can also install Mobiqo using Swift Package Manager by adding the following 
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/mobiqo/mobiqo-ios.git", from: "0.0.6")
+    .package(url: "https://github.com/mobiqo/mobiqo-ios.git", from: "0.0.7")
 ]
 ```
 
