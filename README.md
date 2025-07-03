@@ -175,6 +175,7 @@ public enum EventType: String, Codable {
     case paywallDismiss = "paywall_dismiss"
     case purchaseAttempt = "purchase_attempt"
     case purchaseSuccess = "purchase_success"
+    case purchaseFailed = "purchase_failed"
     case formSubmit = "form_submit"
     case navigation = "navigation"
     case error = "error"

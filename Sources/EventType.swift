@@ -20,6 +20,8 @@ public enum EventType: String, Codable {
     /// Records a successful in-app purchase.
     /// Note: This is typically used if not relying on a RevenueCat webhook or similar server-side purchase validation.
     case purchaseSuccess = "purchase_success"
+    /// Records a failed in-app purchase.
+    case purchaseFailed = "purchase_failed"
     /// Tracks the submission of a form or input field.
     case formSubmit = "form_submit"
     /// Records user navigation between different screens or sections of the app.

@@ -84,6 +84,7 @@ class MobiqoTests: XCTestCase {
         XCTAssertEqual(EventType.paywallDismiss.rawValue, "paywall_dismiss")
         XCTAssertEqual(EventType.purchaseAttempt.rawValue, "purchase_attempt")
         XCTAssertEqual(EventType.purchaseSuccess.rawValue, "purchase_success")
+        XCTAssertEqual(EventType.purchaseFailed.rawValue, "purchase_failed")
         XCTAssertEqual(EventType.formSubmit.rawValue, "form_submit")
         XCTAssertEqual(EventType.navigation.rawValue, "navigation")
         XCTAssertEqual(EventType.error.rawValue, "error")
