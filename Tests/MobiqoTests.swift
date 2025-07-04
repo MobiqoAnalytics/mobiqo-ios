@@ -146,7 +146,7 @@ class MobiqoTests: XCTestCase {
             },
             "statistics": {
                 "purchasing_power_parity": 0.75,
-                "purchase_probability": 0.25,
+                "purchase_intent": 0.25,
                 "avg_arpu": 5.50,
                 "avg_arppu": 20.0,
                 "avg_ltv": 50.0
@@ -162,7 +162,7 @@ class MobiqoTests: XCTestCase {
         XCTAssertEqual(syncResponse.appUser.projectId, "project_def")
         XCTAssertNil(syncResponse.appUser.revenueCatUserId)
         XCTAssertEqual(syncResponse.statistics.purchasingPowerParity, 0.75)
-        XCTAssertEqual(syncResponse.statistics.purchaseProbability, 0.25)
+        XCTAssertEqual(syncResponse.statistics.purchaseIntent, 0.25)
     }
 
     // --- Placeholder for future tests ---

@@ -100,7 +100,7 @@ public struct Statistics: Codable {
     /// A score representing the user's purchasing power parity, typically relative to a baseline.
     public let purchasingPowerParity: Double
     /// The predicted probability (0.0 to 1.0) of the user making a purchase.
-    public let purchaseProbability: Double
+    public let purchaseIntent: Double
     /// The average revenue per user (ARPU).
     public let avgArpu: Double
     /// The average revenue per paying user (ARPPU).
@@ -110,7 +110,7 @@ public struct Statistics: Codable {
 
     enum CodingKeys: String, CodingKey {
         case purchasingPowerParity = "purchasing_power_parity"
-        case purchaseProbability = "purchase_probability"
+        case purchaseIntent = "purchase_intent"
         case avgArpu = "avg_arpu"
         case avgArppu = "avg_arppu"
         case avgLtv = "avg_ltv"

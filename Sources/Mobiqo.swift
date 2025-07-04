@@ -106,11 +106,12 @@ public class Mobiqo {
     ///
     /// - Parameters:
     ///   - revenueCatUserId: The RevenueCat user identifier.
+    ///   - includeAdvancedAnalysis: Whether to include advanced analysis in the response (purchase probability and other data, but request takes more time).
     ///   - additionalData: Optional extra user data to store (email, plan, etc.).
     ///   - completion: An optional closure called with the result of the synchronization.
     ///                 It receives a `Result` type containing either a `SyncUserResponse` on success
     ///                 or an `Error` on failure.
-    public func syncUser(revenueCatUserId: String, additionalData: [String: Any]? = nil, completion: ((Result<SyncUserResponse, Error>) -> Void)? = nil) {
+    public func syncUser(revenueCatUserId: String, includeAdvancedAnalysis: Bool? = nil, additionalData: [String: Any]? = nil, completion: ((Result<SyncUserResponse, Error>) -> Void)? = nil) {
         guard let currentProjectId = projectId else {
             completion?(.failure(MobiqoError.sdkNotInitialized))
             return
@@ -130,6 +131,10 @@ public class Mobiqo {
             "project_id": currentProjectId,
             "local_timestamp": Int(Date().timeIntervalSince1970 * 1000) // milliseconds
         ]
+        
+        if let includeAdvancedAnalysis = includeAdvancedAnalysis {
+            requestBody["include_advanced_analysis"] = includeAdvancedAnalysis
+        }
         
         if let additionalData = additionalData {
             requestBody["additional_data"] = additionalData
@@ -242,10 +247,16 @@ public class Mobiqo {
     ///
     /// - Parameters:
     ///   - revenueCatUserId: The RevenueCat user identifier to look up.
+    ///   - includeAdvancedAnalysis: Whether to include advanced analysis in the response (purchase probability and other data, but request takes more time).
     ///   - completion: A closure called with the result of the operation.
     ///                 It receives a `Result` containing either a `GetUserInfoResponse` on success
     ///                 or an `Error` on failure.
-    public func getUserInfo(revenueCatUserId: String, completion: @escaping (Result<GetUserInfoResponse, Error>) -> Void) {
+    public func getUserInfo(revenueCatUserId: String, includeAdvancedAnalysis: Bool? = nil, completion: @escaping (Result<GetUserInfoResponse, Error>) -> Void) {
+        guard let currentProjectId = projectId else {
+            completion(.failure(MobiqoError.sdkNotInitialized))
+            return
+        }
+
         guard let url = URL(string: "\(apiBaseUrl)/getAppUser") else {
             completion(.failure(MobiqoError.invalidUrl))
             return
@@ -255,7 +266,14 @@ public class Mobiqo {
         request.httpMethod = "POST"
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
 
-        let requestBody = ["revenue_cat_user_id": revenueCatUserId]
+        var requestBody: [String: Any] = [
+            "revenue_cat_user_id": revenueCatUserId,
+            "project_id": currentProjectId
+        ]
+        
+        if let includeAdvancedAnalysis = includeAdvancedAnalysis {
+            requestBody["include_advanced_analysis"] = includeAdvancedAnalysis
+        }
         
         do {
             request.httpBody = try JSONSerialization.data(withJSONObject: requestBody, options: [])
