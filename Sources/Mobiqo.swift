@@ -98,10 +98,24 @@ public class Mobiqo {
         }.resume()
     }
 
+    /// Gets the device model identifier
+    ///
+    /// - Returns: Device model identifier (e.g., "iPhone13,2")
+    private func getDeviceModel() -> String {
+        var systemInfo = utsname()
+        uname(&systemInfo)
+        let machineMirror = Mirror(reflecting: systemInfo.machine)
+        let identifier = machineMirror.children.reduce("") { identifier, element in
+            guard let value = element.value as? Int8, value != 0 else { return identifier }
+            return identifier + String(UnicodeScalar(UInt8(value)))
+        }
+        return identifier.isEmpty ? "unknown" : identifier
+    }
+
     /// Synchronizes the current user's data with the Mobiqo backend and starts a tracking session.
     ///
     /// This method links a RevenueCat user ID with Mobiqo analytics and starts
-    /// automatic heartbeat tracking (every 30 seconds). Call this after user login
+    /// automatic heartbeat tracking (every 20 seconds). Call this after user login
     /// or when you want to start tracking a user's session.
     ///
     /// - Parameters:
@@ -126,16 +140,19 @@ public class Mobiqo {
         request.httpMethod = "POST"
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
 
+        let deviceModel = getDeviceModel()
+
         var requestBody: [String: Any] = [
             "revenue_cat_user_id": revenueCatUserId,
             "project_id": currentProjectId,
+            "device_model": deviceModel,
             "local_timestamp": Int(Date().timeIntervalSince1970 * 1000) // milliseconds
         ]
-        
+
         if let includeAdvancedAnalysis = includeAdvancedAnalysis {
             requestBody["include_advanced_analysis"] = includeAdvancedAnalysis
         }
-        
+
         if let additionalData = additionalData {
             requestBody["additional_data"] = additionalData
         }
@@ -308,12 +325,12 @@ public class Mobiqo {
 
     /// Starts a periodic heartbeat timer that sends a signal to the Mobiqo backend.
     /// This helps in tracking user sessions and activity.
-    /// The heartbeat interval is fixed at 30 seconds to match Capacitor SDK.
+    /// The heartbeat interval is fixed at 20 seconds for better session accuracy.
     /// This method is called internally upon successful user sync.
     private func startHeartbeat() {
         DispatchQueue.main.async { // Ensure timer operations are on the main thread
             self.heartbeatTimer?.invalidate() // Invalidate existing timer to prevent multiples
-            self.heartbeatTimer = Timer.scheduledTimer(withTimeInterval: 30.0, repeats: true) { [weak self] _ in
+            self.heartbeatTimer = Timer.scheduledTimer(withTimeInterval: 20.0, repeats: true) { [weak self] _ in
                 self?.sendHeartbeat()
             }
         }

@@ -24,6 +24,8 @@ public struct AppUser: Codable {
     public let country: String?
     /// Optional. The user's preferred language code (e.g., "en").
     public let language: String?
+    /// The A/B testing group assignment for the user ('red' or 'blue').
+    public let group: String
     /// An ISO 8601 formatted timestamp indicating when the user was first seen by Mobiqo.
     /// This is typically set by the server.
     public let firstSeenAt: String
@@ -43,6 +45,7 @@ public struct AppUser: Codable {
         case appVersion = "app_version"
         case country
         case language
+        case group
         case firstSeenAt = "first_seen_at"
         case lastSeenAt = "last_seen_at"
         case activeEntitlements = "active_entitlements"
@@ -60,6 +63,7 @@ public struct AppUser: Codable {
         appVersion = try container.decode(String.self, forKey: .appVersion)
         country = try container.decodeIfPresent(String.self, forKey: .country)
         language = try container.decodeIfPresent(String.self, forKey: .language)
+        group = try container.decode(String.self, forKey: .group)
         activeEntitlements = try container.decode([String].self, forKey: .activeEntitlements)
         
         // Handle timestamp fields that can be either String or Number
