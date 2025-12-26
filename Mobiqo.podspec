@@ -1,7 +1,7 @@
 # mobiqo-ios/Mobiqo.podspec
 Pod::Spec.new do |s|
   s.name             = 'Mobiqo'
-  s.version          = '0.0.10'
+  s.version          = '1.0.0'
   s.summary          = 'Mobiqo SDK for native iOS applications.'
   s.description      = <<-DESC
                      The Mobiqo SDK allows native iOS applications to track user events,

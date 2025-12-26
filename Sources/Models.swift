@@ -2,6 +2,35 @@
 
 import Foundation
 
+/// Additional user data for sync and update operations
+public struct AdditionalData {
+    /// Optional user identifier
+    public let userId: String?
+    /// Optional user display name
+    public let userName: String?
+    /// Optional user email address
+    public let userEmail: String?
+    /// Optional referrer/source tracking
+    public let referrer: String?
+
+    public init(userId: String? = nil, userName: String? = nil, userEmail: String? = nil, referrer: String? = nil) {
+        self.userId = userId
+        self.userName = userName
+        self.userEmail = userEmail
+        self.referrer = referrer
+    }
+
+    /// Converts AdditionalData to the personal_data format expected by the API
+    func toPersonalData() -> [String: Any?] {
+        return [
+            "id": userId,
+            "name": userName,
+            "email": userEmail,
+            "referrer": referrer
+        ]
+    }
+}
+
 /// Represents a user within the Mobiqo system, including their device information and Mobiqo-specific attributes.
 public struct AppUser: Codable {
     /// The unique identifier for the user within the Mobiqo system.

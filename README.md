@@ -26,7 +26,7 @@ You can also install Mobiqo using Swift Package Manager by adding the following 
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/MobiqoAnalytics/mobiqo-ios.git", from: "0.0.10")
+    .package(url: "https://github.com/MobiqoAnalytics/mobiqo-ios.git", from: "1.0.0")
 ]
 ```
 
@@ -66,10 +66,12 @@ func application(_ application: UIApplication, didFinishLaunchingWithOptions lau
 Mobiqo.shared.syncUser(
     revenueCatUserId: "user-123",
     includeAdvancedAnalysis: false,
-    additionalData: [
-        "email": "user@example.com",
-        "plan": "premium"
-    ]
+    additionalData: AdditionalData(
+        userId: "user-123",
+        userName: "John Doe",
+        userEmail: "user@example.com",
+        referrer: "google"
+    )
 ) { result in
     switch result {
     case .success(let response):
@@ -116,6 +118,27 @@ Mobiqo.shared.trackEvent(
 }
 ```
 
+### Update user data
+
+```swift
+// Update user information without creating a new session
+Mobiqo.shared.updateUser(
+    revenueCatUserId: "user-123",
+    additionalData: AdditionalData(
+        userId: "user-123",
+        userName: "John Doe Updated",
+        userEmail: "newemail@example.com",
+        referrer: "facebook"
+    )
+) { success, error in
+    if success {
+        print("User updated successfully")
+    } else {
+        print("Failed to update user: \(error?.localizedDescription ?? "Unknown error")")
+    }
+}
+```
+
 ### Get user information
 
 ```swift
@@ -151,8 +174,14 @@ Initialize the Mobiqo service with your API key.
 Sync user data with Mobiqo and start a session.
 - `revenueCatUserId` (String): RevenueCat user ID
 - `includeAdvancedAnalysis` (Bool, optional): whether or not to include advanced analysis in the response (to get the purchase probability and other data, but the request will take more time)
-- `additionalData` ([String: Any], optional): Additional user data
+- `additionalData` (AdditionalData, optional): Additional user data (userId, userName, userEmail, referrer)
 - `completion` (Optional closure): Called with `Result<SyncUserResponse, Error>`
+
+#### `updateUser(revenueCatUserId:additionalData:completion:)`
+Update user information without creating a new session.
+- `revenueCatUserId` (String): RevenueCat user ID
+- `additionalData` (AdditionalData, optional): Additional user data to update (userId, userName, userEmail, referrer)
+- `completion` (Optional closure): Called with success/failure result
 
 #### `getUserInfo(revenueCatUserId:includeAdvancedAnalysis:completion:)`
 Retrieve user information from Mobiqo.
@@ -235,6 +264,18 @@ public struct Statistics: Codable {
     public let avgArpu: Double
     public let avgArppu: Double
     public let avgLtv: Double
+}
+```
+
+#### `AdditionalData`
+```swift
+public struct AdditionalData {
+    public let userId: String?
+    public let userName: String?
+    public let userEmail: String?
+    public let referrer: String?
+
+    public init(userId: String? = nil, userName: String? = nil, userEmail: String? = nil, referrer: String? = nil)
 }
 ```
 
@@ -376,4 +417,3 @@ MIT
 ## Support
 
 For support and questions, please contact the Mobiqo team or visit [getmobiqo.com](https://getmobiqo.com).
-```

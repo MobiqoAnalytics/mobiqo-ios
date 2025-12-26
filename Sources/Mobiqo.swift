@@ -121,11 +121,11 @@ public class Mobiqo {
     /// - Parameters:
     ///   - revenueCatUserId: The RevenueCat user identifier.
     ///   - includeAdvancedAnalysis: Whether to include advanced analysis in the response (purchase probability and other data, but request takes more time).
-    ///   - additionalData: Optional extra user data to store (email, plan, etc.).
+    ///   - additionalData: Optional extra user data to store (userId, userName, userEmail, referrer).
     ///   - completion: An optional closure called with the result of the synchronization.
     ///                 It receives a `Result` type containing either a `SyncUserResponse` on success
     ///                 or an `Error` on failure.
-    public func syncUser(revenueCatUserId: String, includeAdvancedAnalysis: Bool? = nil, additionalData: [String: Any]? = nil, completion: ((Result<SyncUserResponse, Error>) -> Void)? = nil) {
+    public func syncUser(revenueCatUserId: String, includeAdvancedAnalysis: Bool? = nil, additionalData: AdditionalData? = nil, completion: ((Result<SyncUserResponse, Error>) -> Void)? = nil) {
         guard let currentProjectId = projectId else {
             completion?(.failure(MobiqoError.sdkNotInitialized))
             return
@@ -154,7 +154,9 @@ public class Mobiqo {
         }
 
         if let additionalData = additionalData {
-            requestBody["additional_data"] = additionalData
+            requestBody["personal_data"] = additionalData.toPersonalData()
+        } else {
+            requestBody["personal_data"] = [:]
         }
 
         do {
@@ -194,6 +196,61 @@ public class Mobiqo {
             } catch {
                 completion?(.failure(MobiqoError.decodingError(error)))
             }
+        }.resume()
+    }
+
+    /// Updates user data in Mobiqo.
+    ///
+    /// This method allows you to update additional user data for an existing user.
+    /// Use this when you want to update user information without creating a new session.
+    ///
+    /// - Parameters:
+    ///   - revenueCatUserId: The RevenueCat user identifier.
+    ///   - additionalData: Optional extra user data to update (userId, userName, userEmail, referrer).
+    ///   - completion: An optional closure called upon completion of the update.
+    ///                 It receives a `Bool` indicating success and an optional `Error`.
+    public func updateUser(revenueCatUserId: String, additionalData: AdditionalData? = nil, completion: ((_ success: Bool, _ error: Error?) -> Void)? = nil) {
+        guard let currentProjectId = projectId else {
+            completion?(false, MobiqoError.sdkNotInitialized)
+            return
+        }
+
+        guard let url = URL(string: "\(apiBaseUrl)/updateUser") else {
+            completion?(false, MobiqoError.invalidUrl)
+            return
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+
+        let requestBody: [String: Any] = [
+            "revenue_cat_user_id": revenueCatUserId,
+            "project_id": currentProjectId,
+            "personal_data": additionalData?.toPersonalData() ?? [:]
+        ]
+
+        do {
+            request.httpBody = try JSONSerialization.data(withJSONObject: requestBody, options: [])
+        } catch {
+            completion?(false, MobiqoError.encodingError(error))
+            return
+        }
+
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                completion?(false, MobiqoError.networkError(error))
+                return
+            }
+            guard let httpResponse = response as? HTTPURLResponse else {
+                completion?(false, MobiqoError.invalidResponse)
+                return
+            }
+            guard (200...299).contains(httpResponse.statusCode) else {
+                completion?(false, MobiqoError.apiError(statusCode: httpResponse.statusCode, message: "Update user failed. Raw response: \(String(data: data ?? Data(), encoding: .utf8) ?? "")"))
+                return
+            }
+            completion?(true, nil)
         }.resume()
     }
 

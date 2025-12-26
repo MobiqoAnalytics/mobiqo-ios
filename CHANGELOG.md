@@ -5,6 +5,40 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0] - 2025-12-06
+
+### Added
+- **MAJOR RELEASE**: First stable production release of Mobiqo iOS SDK
+- Added `AdditionalData` struct for structured user data with fields:
+  - `userId`: Optional user identifier
+  - `userName`: Optional user display name
+  - `userEmail`: Optional user email address
+  - `referrer`: Optional referrer/source tracking
+- Added `updateUser()` method to update user information without creating a new session
+- Added `additionalData` parameter to `syncUser()` method for passing structured user data
+- Enhanced API requests to include `personal_data` field with user information
+- Comprehensive documentation for all public methods and structs
+
+### Changed
+- `syncUser()` now accepts typed `AdditionalData` parameter instead of generic `[String: Any]`
+- `syncUser()` API request now includes `project_id` in the request body for consistency
+- `updateUser()` API request includes `project_id` for proper server-side validation
+- Improved type safety across all user-related operations
+- Enhanced error handling in `updateUser()` method
+- Updated README with detailed examples of new features and correct struct usage
+- Updated Mobiqo.podspec and Package.swift version to 1.0.0
+
+### Fixed
+- Corrected code examples to use proper `AdditionalData` struct
+- Fixed extra closing backtick in README
+- Updated all examples to reflect actual struct structure
+
+### Documentation
+- Updated README with `updateUser()` method usage examples
+- Added `AdditionalData` struct documentation to API Reference
+- Corrected all examples to use proper field names matching the Swift structs
+- Enhanced method documentation with clearer parameter descriptions
+
 ## [0.0.10]
 
 ### Added
